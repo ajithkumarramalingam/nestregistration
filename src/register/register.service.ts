@@ -17,7 +17,7 @@ export class RegisterService {
   }
 //check email
   async checkmail(email: string) {
-    return await this.registerRepository.findOne({where: {email: email},select: ['email','isVerified','password']});
+    return await this.registerRepository.findOne({where: {email: email},select: ['email','isVerified','password','count','time',"updatedAt"]});
   }
 //verify
   async updateverify(updateRegisterDto:any, isVerified: boolean) {
@@ -26,6 +26,10 @@ export class RegisterService {
 //update password
   async updatepassword(updateRegisterDto:any, password: any) {
     return await this.registerRepository.update({email:updateRegisterDto},{password: password});
+  }
+//throttling
+  async updatecount(email:any, count: any) {
+    return await this.registerRepository.update({email},{count});
   }
 
 
