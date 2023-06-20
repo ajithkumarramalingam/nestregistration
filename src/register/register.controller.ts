@@ -5,6 +5,7 @@ import { Request,Response } from 'express';
 import { MailerService } from './mail.service';
 import * as jwt from 'jsonwebtoken';
 import {hash,compare} from 'bcryptjs';
+import * as moment from 'moment';
 
 @Controller('register')
 export class RegisterController {
@@ -14,6 +15,8 @@ export class RegisterController {
 //insert  
 @Post('insert')
 async create(@Req() req: Request, @Res() res: Response, @Body() createRegisterDto: any) {
+  console.log(createRegisterDto,'createRegisterDto');
+  
   const checkEmail = await this.registerService.checkmail(createRegisterDto.email);
 
   try {     
@@ -39,12 +42,14 @@ async create(@Req() req: Request, @Res() res: Response, @Body() createRegisterDt
 
         await this.registerService.insert(createRegisterDto);
         await this.mailer.sendMail({ email: createRegisterDto.email }, token);
-        res.status(HttpStatus.OK).json({
+         res.status(HttpStatus.OK).json({
           message: 'Registration successful'
         })
+
       }
     } 
      catch (err) {
+      console.log(err,'err');
     res.status(HttpStatus.OK).json({
       message: 'Registration failed'
     })
@@ -86,19 +91,32 @@ async create(@Req() req: Request, @Res() res: Response, @Body() createRegisterDt
       console.log(createRegisterDto,'createRegisterDto');
       
       const checkEmail = await this.registerService.checkmail(createRegisterDto.email);
+      console.log(checkEmail,checkEmail);
+      
+      let logincount = checkEmail.count;
       console.log(checkEmail.password,'checkEmail');
+
+      if (checkEmail.count < 3) {
       if (checkEmail && checkEmail.isVerified == true) {
           console.log("helllllooooo");
           
         if(await compare(createRegisterDto.password, checkEmail.password)){
           console.log("passwordssssss");
           
+          await this.registerService.updatecount(createRegisterDto.email,0);
           res.status(HttpStatus.OK).json({
             message: 'Login successful' 
           })
           return;
         }
         else{
+
+           logincount = logincount + 1;
+           const currenttime:any  = this.mailer.getCurrentTime();
+           console.log(currenttime,'currenttime');
+           
+           
+            await this.registerService.updatecount(createRegisterDto.email,logincount);
           res.status(HttpStatus.OK).json({
             message: 'invalid password'
           })
@@ -110,6 +128,59 @@ async create(@Req() req: Request, @Res() res: Response, @Body() createRegisterDt
         })
       }
     }
+    else{
+console.log('------------------------------------');
+
+const checkEmail = await this.registerService.checkmail(createRegisterDto.email);
+console.log('checkEmail.updatedAt',moment(checkEmail.updatedAt, "YYYY-MM-DD HH:mm:ss"));
+    const blockTime = moment(checkEmail.updatedAt, "YYYY-MM-DD HH:mm:ss"); 
+    console.log(blockTime,'blockTime');
+    const unBlockTime= blockTime.add(2, "hours");
+    console.log(unBlockTime,'unBlockTime');
+    
+    let remainingSeconds = moment(unBlockTime).diff(moment(), "seconds");  
+    let remainingSecond = Math.max(remainingSeconds, 0); //reamining time
+    console.log(remainingSecond,'remainingSecond');
+    if(remainingSecond <= 0 ){
+      if (checkEmail && checkEmail.isVerified == true) {
+        console.log("helllllooooo");
+        
+      if(await compare(createRegisterDto.password, checkEmail.password)){
+        console.log("passwordssssss");
+        
+        // await this.registerService.update({ email:createRegisterDto.email }, { count: 0 });
+        res.status(HttpStatus.OK).json({
+          message: 'Login successful' 
+        })
+        return;
+      }
+      else{
+
+         logincount = logincount + 1;
+         const currenttime:any  = this.mailer.getCurrentTime();
+         console.log(currenttime,'currenttime');
+         
+         
+          await this.registerService.updatecount(createRegisterDto.email,logincount);
+        res.status(HttpStatus.OK).json({
+          message: 'invalid password'
+        })
+      }
+    }
+    else{
+      res.status(HttpStatus.OK).json({
+        message: 'Email not verified'
+      })
+    }
+
+    }else{
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'your account is blocked'
+      })
+    }
+
+  }
+  }
     catch (err) {
       res.status(HttpStatus.OK).json({
         message: 'Login failed'
@@ -174,6 +245,12 @@ async create(@Req() req: Request, @Res() res: Response, @Body() createRegisterDt
         message: 'Password reset failed'
       })
     }}
+//logout
+  // @Post('logout')
+  // async logout(@Req() req: Request, @Res() res: Response, @Body() createRegisterDto: any) {
+  //   try {
+  //     console.log(createRegisterDto,'createRegisterDto');
+
 
         
 

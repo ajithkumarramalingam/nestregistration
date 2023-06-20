@@ -40,4 +40,10 @@ export class Register {
 
     @Column({nullable: true})
     token: string;
+
+    @Column({default: 0})
+    count: number;
+
+    @Column({default: null})
+    time: string;
 }

@@ -4,11 +4,12 @@ import { RegisterController } from './register.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Register } from './entities/register.entity';
 import { MailerService } from './mail.service';
+import moment from 'moment';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Register
+      Register,
     ])
   ],
   controllers: [RegisterController],
