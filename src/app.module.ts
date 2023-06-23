@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RegisterModule } from './register/register.module';
 import { MailerService } from './register/mail.service';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env' }),

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRegisterDto } from './dto/create-register.dto';
 import { UpdateRegisterDto } from './dto/update-register.dto';
 import {Repository} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +16,7 @@ export class RegisterService {
   }
 //check email
   async checkmail(email: string) {
-    return await this.registerRepository.findOne({where: {email: email},select: ['email','isVerified','password','count','time',"updatedAt"]});
+    return await this.registerRepository.findOne({where: {email: email},select: ['email','isVerified','password','count','updatedAt']});
   }
 //verify
   async updateverify(updateRegisterDto:any, isVerified: boolean) {

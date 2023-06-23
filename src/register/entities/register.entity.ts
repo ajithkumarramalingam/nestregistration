@@ -44,6 +44,6 @@ export class Register {
     @Column({default: 0})
     count: number;
 
-    @Column({default: null})
-    time: string;
+    // @Column({default: null})
+    // time: string;
 }

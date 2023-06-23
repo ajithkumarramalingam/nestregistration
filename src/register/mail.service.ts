@@ -50,7 +50,7 @@ export class MailerService {
             '">Click here</a></body></html>',            
         });
     }
-//thortling
+//thorttling
 async  getCurrentTime():Promise<string> {
     const now: Date = new Date(); // Get the current date and time
     const hours: number = now.getHours(); // Get the current hour (0-23)
@@ -60,7 +60,6 @@ async  getCurrentTime():Promise<string> {
     const formattedTime= `${this.padZero(minutes)}:${this.padZero(seconds)}`;
     return formattedTime;
 }
-// Helper function to add leading zero for single-digit values
 async padZero(value: number) :Promise<string>{
     return value.toString().padStart(2, '0');
 }
